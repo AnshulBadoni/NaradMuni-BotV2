@@ -1,0 +1,40 @@
+name: Check Job Emails
+
+on:
+  # Run every 5 minutes
+  schedule:
+    - cron: '*/5 * * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  check-emails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📦 Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: 📧 Check emails and notify
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          POLLINATION_API_KEY: ${{ secrets.POLLINATION_API_KEY }}
+          MAX_EMAILS_PER_RUN: "20"
+        run: python -m src.run_job
