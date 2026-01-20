@@ -342,13 +342,16 @@ def classify_email(subject: str, body: str, sender: str) -> dict:
     """
     result = fast_classifier.classify(subject, body, sender)
     
-    # If rules are confident, use that
-    if result["confidence"] >= 0.5 :
+    if result["label"] == "OTHER" and result["confidence"] >= 0.9:
         return result
     
+    # If rules are confident, use that
+    if result["confidence"] >= 0.5:
+        return result   
+    
     # Borderline cases → ask LLM (but be conservative)
-    if result["label"] == "UNCERTAIN":
-        logger.info(f"🤔 Uncertain ({result['confidence']:.0%}) → asking AI...")
+    if result["label"] in ["UNCERTAIN", "OTHER"]:
+        logger.info(f"Uncertain ({result['confidence']:.0%}) → asking AI...")
         llm_result = classify_with_llm(subject, body, sender)
         llm_result["matches"] = result.get("matches", [])
         return llm_result
