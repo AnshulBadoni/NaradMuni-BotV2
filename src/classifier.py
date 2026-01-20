@@ -343,7 +343,7 @@ def classify_email(subject: str, body: str, sender: str) -> dict:
     result = fast_classifier.classify(subject, body, sender)
     
     # If rules are confident, use that
-    if result["confidence"] >= 0.5 or result["confidence"] <= 0.1:
+    if result["confidence"] >= 0.5 :
         return result
     
     # Borderline cases → ask LLM (but be conservative)
