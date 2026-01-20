@@ -264,10 +264,6 @@ fast_classifier = FastClassifier()
 
 def classify_with_llm(subject: str, body: str, sender: str) -> dict:
     """Use Pollination AI for uncertain emails"""
-    if not config.POLLINATION_API_KEY:
-        logger.warning("No Pollination API key - defaulting to skip")
-        return {"label": "OTHER", "confidence": 0.5, "source": "FALLBACK", "is_job": False}
-
     try:
         prompt = f"""You are a strict job email classifier. 
 
